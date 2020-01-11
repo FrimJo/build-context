@@ -1,23 +1,75 @@
-/**
- * @class ExampleComponent
- */
+import * as React from "react";
 
-import * as React from 'react'
+type Function<S, A, P> = (props: P) => { state: S; actions: A };
 
-import styles from './styles.css'
+export default function createContext<S, A, P extends object>(
+  useHook: Function<S, A, P>
+) {
+  const StateContext = React.createContext<S | undefined>(undefined);
+  const ActionsContext = React.createContext<A | undefined>(undefined);
 
-export type Props = { text: string }
-
-export default class ExampleComponent extends React.Component<Props> {
-  render() {
-    const {
-      text
-    } = this.props
+  const Provider: React.SFC<P> = ({ children, ...props }) => {
+    const { state, actions } = useHook(props as P);
 
     return (
-      <div className={styles.test}>
-        Example Component: {text}
-      </div>
-    )
-  }
+      <StateContext.Provider value={state}>
+        <ActionsContext.Provider value={actions}>
+          {children}
+        </ActionsContext.Provider>
+      </StateContext.Provider>
+    );
+  };
+
+  const useState = () => {
+    const context = React.useContext(StateContext);
+    if (context === undefined) {
+      throw Error("Missing Provider for useState");
+    }
+    return context;
+  };
+
+  const useActions = () => {
+    const context = React.useContext(ActionsContext);
+    if (context === undefined) {
+      throw Error("Missing Provider for useActions");
+    }
+    return context;
+  };
+
+  const StateConsumer: React.SFC<{
+    children: ({ state }: { state: S }) => React.ReactNode;
+  }> = ({ children }) => {
+    return (
+      <StateContext.Consumer>
+        {state => {
+          if (state === undefined) {
+            throw Error("Missing Provider for StateConsumer");
+          }
+          return children({ state });
+        }}
+      </StateContext.Consumer>
+    );
+  };
+  const ActionsConsumer: React.SFC<{
+    children: ({ actions }: { actions: A }) => React.ReactNode;
+  }> = ({ children }) => {
+    return (
+      <ActionsContext.Consumer>
+        {actions => {
+          if (actions === undefined) {
+            throw Error("Missing Provider for ActionsConsumer");
+          }
+          return children({ actions });
+        }}
+      </ActionsContext.Consumer>
+    );
+  };
+
+  return {
+    Provider,
+    useState,
+    useActions,
+    StateConsumer,
+    ActionsConsumer
+  };
 }
