@@ -2,7 +2,7 @@ import * as React from "react";
 
 type Function<S, A, P> = (props: P) => { state: S; actions: A };
 
-export default function createContext<S, A, P extends object>(
+export default function buildContext<S, A, P extends object>(
   useHook: Function<S, A, P>
 ) {
   const StateContext = React.createContext<S | undefined>(undefined);
