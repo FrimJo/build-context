@@ -3,7 +3,8 @@ import * as React from "react";
 type Function<S, A, P> = (props: P) => { state: S; actions: A };
 
 export default function buildContext<S, A, P extends object>(
-  useHook: Function<S, A, P>
+  useHook: Function<S, A, P>,
+  identification?: string
 ) {
   const StateContext = React.createContext<S | undefined>(undefined);
   const ActionsContext = React.createContext<A | undefined>(undefined);
@@ -23,7 +24,7 @@ export default function buildContext<S, A, P extends object>(
   const useState = () => {
     const context = React.useContext(StateContext);
     if (context === undefined) {
-      throw Error("Missing Provider for useState");
+      throw Error(`Missing Provider for useState ${identification}`);
     }
     return context;
   };
@@ -31,7 +32,7 @@ export default function buildContext<S, A, P extends object>(
   const useActions = () => {
     const context = React.useContext(ActionsContext);
     if (context === undefined) {
-      throw Error("Missing Provider for useActions");
+      throw Error(`Missing Provider for useActions ${identification}`);
     }
     return context;
   };
@@ -43,7 +44,7 @@ export default function buildContext<S, A, P extends object>(
       <StateContext.Consumer>
         {state => {
           if (state === undefined) {
-            throw Error("Missing Provider for StateConsumer");
+            throw Error(`Missing Provider for StateConsumer ${identification}`);
           }
           return children({ state });
         }}
@@ -57,7 +58,9 @@ export default function buildContext<S, A, P extends object>(
       <ActionsContext.Consumer>
         {actions => {
           if (actions === undefined) {
-            throw Error("Missing Provider for ActionsConsumer");
+            throw Error(
+              `Missing Provider for ActionsConsumer ${identification}`
+            );
           }
           return children({ actions });
         }}
