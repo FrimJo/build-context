@@ -38,7 +38,7 @@ export default function buildContext<S, A, P extends object>(
   };
 
   const StateConsumer: React.SFC<{
-    children: ({ state }: { state: S }) => React.ReactNode;
+    children: (state: S) => React.ReactNode;
   }> = ({ children }) => {
     return (
       <StateContext.Consumer>
@@ -46,13 +46,13 @@ export default function buildContext<S, A, P extends object>(
           if (state === undefined) {
             throw Error(`Missing Provider for StateConsumer ${identification}`);
           }
-          return children({ state });
+          return children(state);
         }}
       </StateContext.Consumer>
     );
   };
   const ActionsConsumer: React.SFC<{
-    children: ({ actions }: { actions: A }) => React.ReactNode;
+    children: (actions: A) => React.ReactNode;
   }> = ({ children }) => {
     return (
       <ActionsContext.Consumer>
@@ -62,7 +62,7 @@ export default function buildContext<S, A, P extends object>(
               `Missing Provider for ActionsConsumer ${identification}`
             );
           }
-          return children({ actions });
+          return children(actions);
         }}
       </ActionsContext.Consumer>
     );
@@ -72,6 +72,8 @@ export default function buildContext<S, A, P extends object>(
     Provider,
     useState,
     useActions,
+    StateContext,
+    ActionsContext,
     StateConsumer,
     ActionsConsumer
   };
