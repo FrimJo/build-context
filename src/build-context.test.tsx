@@ -22,10 +22,10 @@ const App = () => {
 const ExampleComponent = () => {
   return (
     <Context.StateConsumer>
-      {({ state }) => {
+      {state => {
         return (
           <Context.ActionsConsumer>
-            {({ actions }) => (
+            {actions => (
               <div>
                 <span data-testid="count">{state.count}</span>
                 <button data-testid="increment" onClick={actions.increment}>
